@@ -4,16 +4,12 @@ import android.content.ComponentName;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
 import com.codegama.todolistapplication.R;
 import com.codegama.todolistapplication.adapter.TaskAdapter;
 import com.codegama.todolistapplication.bottomSheetFragment.CreateTaskBottomSheetFragment;
@@ -21,6 +17,7 @@ import com.codegama.todolistapplication.bottomSheetFragment.ShowCalendarViewBott
 import com.codegama.todolistapplication.broadcastReceiver.AlarmBroadcastReceiver;
 import com.codegama.todolistapplication.database.DatabaseClient;
 import com.codegama.todolistapplication.model.Task;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,12 +29,10 @@ public class MainActivity extends BaseActivity implements CreateTaskBottomSheetF
 
     @BindView(R.id.taskRecycler)
     RecyclerView taskRecycler;
-    @BindView(R.id.addTask)
-    TextView addTask;
+    @BindView(R.id.add_task)
+    FloatingActionButton addTask;
     TaskAdapter taskAdapter;
     List<Task> tasks = new ArrayList<>();
-    @BindView(R.id.noDataImage)
-    ImageView noDataImage;
     @BindView(R.id.calendar)
     ImageView calendar;
 
@@ -51,8 +46,7 @@ public class MainActivity extends BaseActivity implements CreateTaskBottomSheetF
         ComponentName receiver = new ComponentName(this, AlarmBroadcastReceiver.class);
         PackageManager pm = getPackageManager();
         pm.setComponentEnabledSetting(receiver, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
-        Glide.with(getApplicationContext()).load(R.drawable.first_note).into(noDataImage);
-
+//        Glide.with(getApplicationContext()).load(R.drawable.first_note).into(noDataImage);
         addTask.setOnClickListener(view -> {
             CreateTaskBottomSheetFragment createTaskBottomSheetFragment = new CreateTaskBottomSheetFragment();
             createTaskBottomSheetFragment.setTaskId(0, false, this, MainActivity.this);
@@ -89,7 +83,6 @@ public class MainActivity extends BaseActivity implements CreateTaskBottomSheetF
             @Override
             protected void onPostExecute(List<Task> tasks) {
                 super.onPostExecute(tasks);
-                noDataImage.setVisibility(tasks.isEmpty() ? View.VISIBLE : View.GONE);
                 setUpAdapter();
             }
         }

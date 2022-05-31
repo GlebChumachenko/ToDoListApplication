@@ -25,8 +25,6 @@ public class Task implements Serializable {
     String secondAlarmTime;
     @ColumnInfo(name = "lastAlarm")
     String lastAlarm;
-    @ColumnInfo(name = "event")
-    String event;
 
     public Task() {
 
@@ -34,14 +32,6 @@ public class Task implements Serializable {
 
     public boolean isComplete() {
         return isComplete;
-    }
-
-    public String getEvent() {
-        return event;
-    }
-
-    public void setEvent(String event) {
-        this.event = event;
     }
 
     public void setComplete(boolean complete) {

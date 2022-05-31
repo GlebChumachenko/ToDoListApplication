@@ -2,7 +2,9 @@ package com.codegama.todolistapplication.database;
 
 import androidx.room.Dao;
 import androidx.room.Insert;
+import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
+import androidx.room.Update;
 
 import com.codegama.todolistapplication.model.Task;
 
@@ -23,12 +25,14 @@ public interface OnDataBaseAction {
     @Query("DELETE FROM Task WHERE taskId = :taskId")
     void deleteTaskFromId(int taskId);
 
+    @Update(onConflict = OnConflictStrategy.REPLACE)
+    void setComplete(Task taskToUpdate);
+
     @Query("SELECT * FROM Task WHERE taskId = :taskId")
     Task selectDataFromAnId(int taskId);
 
     @Query("UPDATE Task SET taskTitle = :taskTitle, taskDescription = :taskDescription, date = :taskDate, " +
-            "lastAlarm = :taskTime, event = :taskEvent WHERE taskId = :taskId")
-    void updateAnExistingRow(int taskId, String taskTitle, String taskDescription , String taskDate, String taskTime,
-                            String taskEvent);
+            "lastAlarm = :taskTime WHERE taskId = :taskId")
+    void updateAnExistingRow(int taskId, String taskTitle, String taskDescription, String taskDate, String taskTime);
 
 }

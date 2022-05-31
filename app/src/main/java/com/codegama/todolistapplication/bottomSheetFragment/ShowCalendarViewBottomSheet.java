@@ -18,11 +18,9 @@ import com.codegama.todolistapplication.database.DatabaseClient;
 import com.codegama.todolistapplication.model.Task;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
-import com.google.android.material.drawable.DrawableUtils;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.List;
 
 import butterknife.BindView;
@@ -40,7 +38,7 @@ public class ShowCalendarViewBottomSheet extends BottomSheetDialogFragment {
     List<Task> tasks = new ArrayList<>();
 
 
-    private BottomSheetBehavior.BottomSheetCallback mBottomSheetBehaviorCallback = new BottomSheetBehavior.BottomSheetCallback() {
+    private final BottomSheetBehavior.BottomSheetCallback mBottomSheetBehaviorCallback = new BottomSheetBehavior.BottomSheetCallback() {
 
         @Override
         public void onStateChanged(@NonNull View bottomSheet, int newState) {
@@ -65,11 +63,6 @@ public class ShowCalendarViewBottomSheet extends BottomSheetDialogFragment {
         calendarView.setHeaderColor(R.color.colorAccent);
         getSavedTasks();
         back.setOnClickListener(view -> dialog.dismiss());
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
     }
 
     private void getSavedTasks() {
@@ -99,7 +92,7 @@ public class ShowCalendarViewBottomSheet extends BottomSheetDialogFragment {
     public List<EventDay> getHighlitedDays() {
         List<EventDay> events = new ArrayList<>();
 
-        for(int i = 0; i < tasks.size(); i++) {
+        for (int i = 0; i < tasks.size(); i++) {
             Calendar calendar = Calendar.getInstance();
             String[] items1 = tasks.get(i).getDate().split("-");
             String dd = items1[0];

@@ -6,13 +6,13 @@ import androidx.room.DatabaseConfiguration;
 import androidx.room.InvalidationTracker;
 import androidx.room.RoomDatabase;
 import androidx.sqlite.db.SupportSQLiteOpenHelper;
+
 import com.codegama.todolistapplication.model.Task;
 
 @Database(entities = {Task.class}, version = 1, exportSchema = false)
-public  abstract class AppDatabase extends RoomDatabase {
+public abstract class AppDatabase extends RoomDatabase {
 
     public abstract OnDataBaseAction dataBaseAction();
-    private static volatile AppDatabase appDatabase;
 
     @NonNull
     @Override

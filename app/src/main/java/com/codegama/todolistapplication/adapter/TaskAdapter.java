@@ -12,12 +12,10 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
 import com.codegama.todolistapplication.R;
 import com.codegama.todolistapplication.activity.MainActivity;
 import com.codegama.todolistapplication.bottomSheetFragment.CreateTaskBottomSheetFragment;
@@ -34,16 +32,16 @@ import butterknife.ButterKnife;
 
 public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder> {
 
-    private MainActivity context;
-    private LayoutInflater inflater;
-    private List<Task> taskList;
-    public SimpleDateFormat dateFormat = new SimpleDateFormat("EE dd MMM yyyy", Locale.US);
-    public SimpleDateFormat inputDateFormat = new SimpleDateFormat("dd-M-yyyy", Locale.US);
+    private final MainActivity context;
+    private final LayoutInflater inflater;
+    private final List<Task> taskList;
+    public final SimpleDateFormat dateFormat = new SimpleDateFormat("EE dd MMM yyyy", Locale.forLanguageTag("ru"));
+    public final SimpleDateFormat inputDateFormat = new SimpleDateFormat("dd-M-yyyy", Locale.forLanguageTag("ru"));
     Date date = null;
     String outputDateString = null;
-    CreateTaskBottomSheetFragment.setRefreshListener setRefreshListener;
+    final CreateTaskBottomSheetFragment.setRefreshListener setRefreshListener;
 
-    public TaskAdapter(MainActivity context, List<Task> taskList,  CreateTaskBottomSheetFragment.setRefreshListener setRefreshListener) {
+    public TaskAdapter(MainActivity context, List<Task> taskList, CreateTaskBottomSheetFragment.setRefreshListener setRefreshListener) {
         this.context = context;
         this.taskList = taskList;
         this.setRefreshListener = setRefreshListener;
@@ -63,8 +61,14 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
         holder.title.setText(task.getTaskTitle());
         holder.description.setText(task.getTaskDescrption());
         holder.time.setText(task.getLastAlarm());
-        holder.status.setText(task.isComplete() ? "COMPLETED" : "UPCOMING");
-        holder.options.setOnClickListener(view -> showPopUpMenu(view, position));
+        holder.status.setText(task.isComplete() ? "ЗАВЕРШЕНО" : "");
+
+        holder.options.setOnClickListener(view ->
+
+                showPopUpMenu(view, position)
+
+
+        );
 
         try {
             date = inputDateFormat.parse(task.getDate());
@@ -87,7 +91,13 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
     public void showPopUpMenu(View view, int position) {
         final Task task = taskList.get(position);
         PopupMenu popupMenu = new PopupMenu(context, view);
-        popupMenu.getMenuInflater().inflate(R.menu.menu, popupMenu.getMenu());
+        if (task.isComplete()) {
+            popupMenu.getMenuInflater().inflate(R.menu.menu_completed, popupMenu.getMenu());
+        } else {
+            popupMenu.getMenuInflater().inflate(R.menu.menu, popupMenu.getMenu());
+        }
+
+
         popupMenu.setOnMenuItemClickListener(item -> {
             switch (item.getItemId()) {
                 case R.id.menuDelete:
@@ -106,7 +116,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
                 case R.id.menuComplete:
                     AlertDialog.Builder completeAlertDialog = new AlertDialog.Builder(context, R.style.AppTheme_Dialog);
                     completeAlertDialog.setTitle(R.string.confirmation).setMessage(R.string.sureToMarkAsComplete).
-                            setPositiveButton(R.string.yes, (dialog, which) -> showCompleteDialog(task.getTaskId(), position))
+                            setPositiveButton(R.string.yes, (dialog, which) -> showCompleteDialog(task, position))
                             .setNegativeButton(R.string.no, (dialog, which) -> dialog.cancel()).show();
                     break;
             }
@@ -115,12 +125,14 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
         popupMenu.show();
     }
 
-    public void showCompleteDialog(int taskId, int position) {
+    public void showCompleteDialog(Task task, int position) {
         Dialog dialog = new Dialog(context, R.style.AppTheme);
         dialog.setContentView(R.layout.dialog_completed_theme);
         Button close = dialog.findViewById(R.id.closeButton);
         close.setOnClickListener(view -> {
-            deleteTaskFromId(taskId, position);
+//            deleteTaskFromId(taskId, position);
+            task.setComplete(true);
+            updateTaskFromId(task);
             dialog.dismiss();
         });
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
@@ -151,10 +163,38 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
         savedTasks.execute();
     }
 
+    private void updateTaskFromId(Task task) {
+        class GetSavedTasks extends AsyncTask<Void, Void, List<Task>> {
+            @Override
+            protected List<Task> doInBackground(Void... voids) {
+                DatabaseClient.getInstance(context)
+                        .getAppDatabase()
+                        .dataBaseAction()
+                        .setComplete(task);
+
+                return taskList;
+            }
+
+            @Override
+            protected void onPostExecute(List<Task> tasks) {
+                super.onPostExecute(tasks);
+//                removeAtPosition(position);
+                notifyUpdated();
+                setRefreshListener.refresh();
+            }
+        }
+        GetSavedTasks savedTasks = new GetSavedTasks();
+        savedTasks.execute();
+    }
+
     private void removeAtPosition(int position) {
         taskList.remove(position);
         notifyItemRemoved(position);
         notifyItemRangeChanged(position, taskList.size());
+    }
+
+    private void notifyUpdated() {
+        notifyDataSetChanged();
     }
 
     @Override

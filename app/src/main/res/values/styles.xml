@@ -16,4 +16,8 @@
         <item name="android:textColor">@color/colorAccent</item>
     </style>
 
+    <style name="mytextview">
+        <item name="fontFamily">@font/montserrat_alternates_medium</item>
+    </style>
+
 </resources>

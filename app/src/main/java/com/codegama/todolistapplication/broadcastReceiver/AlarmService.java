@@ -1,27 +1,20 @@
 package com.codegama.todolistapplication.broadcastReceiver;
 
-import android.app.IntentService;
-import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.media.AudioManager;
 import android.os.IBinder;
-import android.util.Log;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
 
 import com.codegama.todolistapplication.R;
-import com.codegama.todolistapplication.activity.AlarmActivity;
 import com.codegama.todolistapplication.activity.MainActivity;
 
 public class AlarmService extends Service {
-    private static final int NOTIFICATION_ID = 3;
 
     public AlarmService(String name) {
         super();
@@ -29,11 +22,11 @@ public class AlarmService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        onHandleIntent(intent);
+        onHandleIntent();
         return super.onStartCommand(intent, flags, startId);
     }
 
-    protected void onHandleIntent(Intent intent) {
+    protected void onHandleIntent() {
         NotificationManager mNotificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
